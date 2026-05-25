@@ -226,6 +226,7 @@
           <input type="file" id="csvFileInput" accept=".csv,text/csv" onchange="importCSV(this.files[0])" />
         </div>
         <button class="btn btn-secondary btn-sm" onclick="downloadTemplate()">⬇ Download template</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportAllQuestions()">💾 Export all questions</button>
         <span style="font-size:12px;color:var(--gray-400);">CSV format: question_text, unit, difficulty, type, choice_a–d, correct (A/B/C/D), explanation</span>
       </div>
     </div>
@@ -671,6 +672,25 @@ function importCSV(file){
     document.getElementById('csvFileInput').value='';
   };
   reader.readAsText(file);
+}
+
+function exportAllQuestions(){
+  if(!questions.length){toast('No questions to export.','error');return;}
+  const escape=v=>(v==null?'':''+v).replace(/"/g,'""');
+  const header='"question_text","unit","difficulty","type","choice_a","choice_b","choice_c","choice_d","correct","explanation"';
+  const lines=questions.map(q=>{
+    if(q.type==='essay'){
+      return `"${escape(q.text)}","${escape(q.unit)}","${escape(q.difficulty)}","essay","","","","","","${escape(q.rubric)}"`;
+    }
+    return `"${escape(q.text)}","${escape(q.unit)}","${escape(q.difficulty)}","multiple_choice","${escape(q.choices&&q.choices[0]?q.choices[0]:'')}","${escape(q.choices&&q.choices[1]?q.choices[1]:'')}","${escape(q.choices&&q.choices[2]?q.choices[2]:'')}","${escape(q.choices&&q.choices[3]?q.choices[3]:'')}","${escape(q.correct)}","${escape(q.explanation)}"`;
+  });
+  const csv=[header,...lines].join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  const date=new Date().toISOString().slice(0,10);
+  a.download=`ap_psych_backup_${date}.csv`;
+  a.click();
+  toast(`Exported ${questions.length} question${questions.length!==1?'s':''}!`,'success');
 }
 
 function downloadTemplate(){
