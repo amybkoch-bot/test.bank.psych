@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AP Psychology Test Bank</title>
+  <style>
+    :root {
+      --primary:#4f46e5;--primary-light:#e0e7ff;--primary-dark:#3730a3;--accent:#7c3aed;
+      --green:#059669;--green-light:#d1fae5;--red:#dc2626;--red-light:#fee2e2;
+      --yellow:#d97706;--yellow-light:#fef3c7;--purple-light:#fdf4ff;
+      --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;
+      --gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;
+      --gray-800:#1f2937;--gray-900:#111827;--white:#fff;
+      --shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
+      --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+      --shadow-lg:0 10px 15px rgba(0,0,0,.1),0 4px 6px rgba(0,0,0,.05);
+      --radius:10px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh;}
+
+    /* Header */
+    .header{background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%);color:#fff;padding:20px 32px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-md);position:sticky;top:0;z-index:100;}
+    .header-title{font-size:22px;font-weight:700;letter-spacing:-.3px;}
+    .header-subtitle{font-size:13px;opacity:.85;margin-top:2px;}
+    .header-stats{display:flex;gap:24px;}
+    .stat{text-align:center;}
+    .stat-num{font-size:24px;font-weight:700;line-height:1;}
+    .stat-label{font-size:11px;opacity:.8;text-transform:uppercase;letter-spacing:.5px;}
+
+    /* Nav */
+    .nav{background:#fff;border-bottom:1px solid var(--gray-200);display:flex;padding:0 32px;}
+    .nav-tab{padding:14px 20px;cursor:pointer;font-size:14px;font-weight:500;color:var(--gray-500);border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;}
+    .nav-tab:hover{color:var(--primary);}
+    .nav-tab.active{color:var(--primary);border-bottom-color:var(--primary);}
+
+    /* Layout */
+    .main{max-width:1100px;margin:0 auto;padding:28px 24px;}
+    .panel{display:none;}
+    .panel.active{display:block;}
+
+    /* Cards */
+    .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:20px;}
+    .card-title{font-size:16px;font-weight:600;color:var(--gray-800);margin-bottom:16px;}
+
+    /* Form */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .form-group{display:flex;flex-direction:column;gap:6px;}
+    .form-group.full{grid-column:1/-1;}
+    label{font-size:13px;font-weight:500;color:var(--gray-600);}
+    input[type="text"],input[type="number"],textarea,select{padding:9px 12px;border:1px solid var(--gray-300);border-radius:8px;font-size:14px;color:var(--gray-800);outline:none;transition:border .15s;font-family:inherit;background:#fff;}
+    input[type="text"]:focus,input[type="number"]:focus,textarea:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light);}
+    textarea{resize:vertical;min-height:70px;}
+    .choices-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .choice-row{display:flex;gap:8px;align-items:center;}
+    .choice-label{width:28px;height:28px;border-radius:50%;background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .choice-row input[type="text"]{flex:1;}
+    .correct-radio{display:flex;gap:6px;align-items:center;cursor:pointer;}
+    .correct-radio input{cursor:pointer;accent-color:var(--primary);}
+
+    /* Buttons */
+    .btn{padding:9px 18px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+    .btn-primary{background:var(--primary);color:#fff;}
+    .btn-primary:hover{background:var(--primary-dark);}
+    .btn-secondary{background:var(--gray-100);color:var(--gray-700);}
+    .btn-secondary:hover{background:var(--gray-200);}
+    .btn-danger{background:var(--red-light);color:var(--red);}
+    .btn-danger:hover{background:#fca5a5;}
+    .btn-success{background:var(--green);color:#fff;}
+    .btn-success:hover{background:#047857;}
+    .btn-purple{background:var(--purple-light);color:var(--accent);}
+    .btn-purple:hover{background:#ede9fe;}
+    .btn-sm{padding:5px 11px;font-size:12px;}
+    .btn-form{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;}
+
+    /* Filter bar */
+    .filter-bar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;align-items:center;}
+    .filter-bar select,.filter-bar input{font-size:13px;padding:7px 10px;}
+    .filter-bar input{flex:1;min-width:180px;}
+    .results-count{font-size:13px;color:var(--gray-500);margin-left:auto;}
+
+    /* Import section */
+    .import-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--gray-100);}
+    .file-input-wrap{position:relative;overflow:hidden;display:inline-flex;}
+    .file-input-wrap input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0;}
+
+    /* Question cards */
+    .q-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px;margin-bottom:12px;border-left:4px solid var(--primary-light);transition:box-shadow .15s;}
+    .q-card:hover{box-shadow:var(--shadow-md);}
+    .q-card.selected{border-left-color:var(--primary);background:#fafaff;}
+    .q-header{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;}
+    .q-num{font-size:12px;font-weight:600;color:var(--gray-400);padding-top:2px;min-width:24px;}
+    .q-text{font-size:15px;font-weight:500;color:var(--gray-800);flex:1;line-height:1.5;}
+    .q-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+    .badge{font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;}
+    .badge-unit{background:var(--primary-light);color:var(--primary);}
+    .badge-easy{background:var(--green-light);color:var(--green);}
+    .badge-medium{background:var(--yellow-light);color:var(--yellow);}
+    .badge-hard{background:var(--red-light);color:var(--red);}
+    .badge-essay{background:var(--purple-light);color:var(--accent);}
+    .q-choices{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+    .q-choice{font-size:13px;color:var(--gray-600);padding:4px 0;display:flex;gap:6px;}
+    .q-choice.correct{color:var(--green);font-weight:600;}
+    .q-choice-marker{font-weight:600;color:var(--gray-400);}
+    .q-choice.correct .q-choice-marker{color:var(--green);}
+    .q-actions{display:flex;gap:8px;align-items:center;}
+    .select-checkbox{width:16px;height:16px;accent-color:var(--primary);cursor:pointer;}
+
+    /* Empty state */
+    .empty{text-align:center;padding:60px 20px;color:var(--gray-400);}
+    .empty-icon{font-size:48px;margin-bottom:12px;}
+
+    /* Generate options */
+    .gen-options{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+    .gen-option{text-align:center;}
+    .gen-option label{display:block;margin-bottom:6px;font-size:13px;font-weight:500;color:var(--gray-600);}
+    .gen-option input,.gen-option select{width:100%;}
+
+    /* Scramble toggle row */
+    .scramble-row{display:flex;gap:24px;flex-wrap:wrap;margin-bottom:16px;padding:12px 16px;background:var(--gray-50);border-radius:8px;border:1px solid var(--gray-200);}
+    .toggle-item{display:flex;align-items:center;gap:8px;cursor:pointer;}
+    .toggle-item input[type="checkbox"]{width:16px;height:16px;accent-color:var(--primary);cursor:pointer;}
+    .toggle-item span{font-size:13px;font-weight:500;color:var(--gray-700);}
+
+    /* Show-answers toggle */
+    .show-answer-row{display:flex;align-items:center;gap:8px;}
+    .toggle-switch{position:relative;width:40px;height:22px;cursor:pointer;}
+    .toggle-switch input{opacity:0;width:0;height:0;}
+    .slider{position:absolute;inset:0;background:var(--gray-300);border-radius:22px;transition:.2s;}
+    .slider:before{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;left:3px;top:3px;transition:.2s;}
+    .toggle-switch input:checked+.slider{background:var(--primary);}
+    .toggle-switch input:checked+.slider:before{transform:translateX(18px);}
+    .toggle-label{font-size:13px;color:var(--gray-600);font-weight:500;}
+
+    /* Print */
+    #printArea{display:none;}
+    @media print{
+      body>*:not(#printArea){display:none!important;}
+      #printArea{display:block!important;padding:40px;font-family:Georgia,serif;color:#000;}
+      .print-header{margin-bottom:30px;}
+      .print-title{font-size:22px;font-weight:bold;margin-bottom:4px;}
+      .print-meta{font-size:13px;color:#444;}
+      .print-q{margin-bottom:24px;page-break-inside:avoid;}
+      .print-q-text{font-size:15px;margin-bottom:8px;font-weight:500;}
+      .print-choices{padding-left:16px;}
+      .print-choice{font-size:14px;margin-bottom:4px;}
+      .print-essay-lines{margin-top:8px;}
+      .print-essay-line{border-bottom:1px solid #ccc;margin-top:32px;}
+      .print-answer-key{margin-top:40px;border-top:2px solid #000;padding-top:16px;}
+    }
+
+    /* Toast */
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--gray-800);color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;box-shadow:var(--shadow-lg);opacity:0;transform:translateY(8px);transition:all .25s;z-index:9999;pointer-events:none;}
+    .toast.show{opacity:1;transform:translateY(0);}
+    .toast.success{background:var(--green);}
+    .toast.error{background:var(--red);}
+  .img-upload-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.img-preview-wrap{position:relative;display:inline-flex;align-items:flex-start;}
+.img-preview{max-width:260px;max-height:180px;border-radius:8px;border:1px solid var(--gray-200);display:block;}
+.img-remove-btn{position:absolute;top:-8px;right:-8px;background:#ef4444;color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.q-image{max-width:100%;max-height:260px;border-radius:8px;margin:10px 0 4px;display:block;}
+.print-q-image{max-width:85%;max-height:200px;margin:8px 0 4px;display:block;}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+<div id="printArea"></div>
+
+<!-- Header -->
+<div class="header">
+  <div>
+    <div class="header-title">📚 AP Psychology Test Bank</div>
+    <div class="header-subtitle">Create, manage, and export practice questions</div>
+  </div>
+  <div class="header-stats">
+    <div class="stat"><div class="stat-num" id="totalCount">0</div><div class="stat-label">Questions</div></div>
+    <div class="stat"><div class="stat-num" id="unitCount">0</div><div class="stat-label">Units</div></div>
+    <div class="stat"><div class="stat-num" id="selectedCount">0</div><div class="stat-label">Selected</div></div>
+  </div>
+</div>
+
+<!-- Nav -->
+<div class="nav">
+  <div class="nav-tab active" onclick="switchTab('bank')">📋 Question Bank</div>
+  <div class="nav-tab" onclick="switchTab('add')">➕ Add Question</div>
+  <div class="nav-tab" onclick="switchTab('generate')">📄 Generate Test</div>
+</div>
+
+<div class="main">
+
+  <!-- ══ BANK PANEL ══ -->
+  <div class="panel active" id="panel-bank">
+    <div class="card" style="padding:16px 20px;">
+      <div class="filter-bar">
+        <input type="text" id="searchInput" placeholder="🔍  Search questions..." oninput="renderBank()" />
+        <select id="filterUnit" onchange="renderBank()"><option value="">All Units</option></select>
+        <select id="filterDiff" onchange="renderBank()">
+          <option value="">All Difficulties</option>
+          <option value="Easy">Easy</option>
+          <option value="Medium">Medium</option>
+          <option value="Hard">Hard</option>
+        </select>
+        <select id="filterType" onchange="renderBank()">
+          <option value="">All Types</option>
+          <option value="multiple_choice">Multiple Choice</option>
+          <option value="essay">Essay</option>
+        </select>
+        <div class="show-answer-row">
+          <label class="toggle-switch"><input type="checkbox" id="showAnswers" onchange="renderBank()" checked /><span class="slider"></span></label>
+          <span class="toggle-label">Show answers</span>
+        </div>
+        <span class="results-count" id="resultsCount"></span>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <button class="btn btn-secondary btn-sm" onclick="selectAll()">Select all visible</button>
+        <button class="btn btn-secondary btn-sm" onclick="deselectAll()">Deselect all</button>
+        <button class="btn btn-success btn-sm" onclick="switchTab('generate')" id="generateBtn" style="display:none;">📄 Generate test from selected (<span id="genCount">0</span>)</button>
+      </div>
+      <!-- CSV Import -->
+      <div class="import-row">
+        <span style="font-size:13px;font-weight:500;color:var(--gray-600);">Import questions:</span>
+        <div class="file-input-wrap">
+          <button class="btn btn-purple btn-sm">📂 Choose CSV file</button>
+          <input type="file" id="csvFileInput" accept=".csv,text/csv" onchange="importCSV(this.files[0])" />
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="downloadTemplate()">⬇ Download template</button>
+        <span style="font-size:12px;color:var(--gray-400);">CSV format: question_text, unit, difficulty, type, choice_a–d, correct (A/B/C/D), explanation</span>
+      </div>
+    </div>
+    <div id="bankList"></div>
+  </div>
+
+  <!-- ══ ADD PANEL ══ -->
+  <div class="panel" id="panel-add">
+    <div class="card">
+      <div class="card-title" id="formTitle">Add New Question</div>
+      <input type="hidden" id="editId" value="" />
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Question Type *</label>
+          <select id="qType" onchange="onTypeChange()">
+            <option value="multiple_choice">Multiple Choice</option>
+            <option value="essay">Essay / Free Response</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Difficulty *</label>
+          <select id="qDiff">
+            <option value="">Select...</option>
+            <option>Easy</option><option>Medium</option><option>Hard</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Question Text *</label>
+          <textarea id="qText" placeholder="Enter the question..."></textarea>
+        </div>
+        <div class="form-group full">
+          <label>AP Psychology Unit *</label>
+          <select id="qUnit">
+            <option value="">Select unit...</option>
+            <option>Unit 0 – Research Methods</option>
+            <option>Unit 1 – Biological Bases of Behavior</option>
+            <option>Unit 2 – Cognition</option>
+            <option>Unit 3 – Development and Learning</option>
+            <option>Unit 4 – Social Psychology and Personality</option>
+            <option>Unit 5 – Mental and Physical Health</option>
+          </select>
+        </div>
+        <!-- MC-only section -->
+        <div class="form-group full" id="choicesSection">
+          <label>Answer Choices — select the correct answer</label>
+          <div class="choices-grid">
+            <div class="choice-row"><div class="choice-label">A</div><input type="text" id="choiceA" placeholder="Choice A" /><label class="correct-radio"><input type="radio" name="correct" value="A" /> ✓</label></div>
+            <div class="choice-row"><div class="choice-label">B</div><input type="text" id="choiceB" placeholder="Choice B" /><label class="correct-radio"><input type="radio" name="correct" value="B" /> ✓</label></div>
+            <div class="choice-row"><div class="choice-label">C</div><input type="text" id="choiceC" placeholder="Choice C" /><label class="correct-radio"><input type="radio" name="correct" value="C" /> ✓</label></div>
+            <div class="choice-row"><div class="choice-label">D</div><input type="text" id="choiceD" placeholder="Choice D" /><label class="correct-radio"><input type="radio" name="correct" value="D" /> ✓</label></div>
+          </div>
+        </div>
+        <div class="form-group full" id="explanationSection">
+          <label>Explanation (optional)</label>
+          <textarea id="qExplanation" placeholder="Brief explanation of the correct answer..." style="min-height:55px;"></textarea>
+        </div>
+        <!-- Essay-only section -->
+        <div class="form-group full" id="rubricSection" style="display:none;">
+          <label>Rubric / Scoring Notes (optional)</label>
+          <textarea id="qRubric" placeholder="Key points, sample answer elements, or scoring guidance..." style="min-height:90px;"></textarea>
+        </div>
+      </div>
+        <div class="form-group full">
+          <label>Image (optional)</label>
+          <div class="img-upload-row">
+            <input type="file" id="qImageInput" accept="image/*" style="display:none;" onchange="handleImageUpload(this.files[0])"/>
+            <button type="button" class="btn btn-secondary" style="font-size:13px;padding:6px 14px;" onclick="document.getElementById('qImageInput').click()">📷 Attach Image</button>
+            <div id="imgPreviewWrap" style="display:none;" class="img-preview-wrap">
+              <img id="imgPreview" class="img-preview" src="" alt="Question image"/>
+              <button class="img-remove-btn" onclick="clearImage()" title="Remove image">×</button>
+            </div>
+          </div>
+        </div>
+      <div class="btn-form">
+        <button class="btn btn-primary" onclick="saveQuestion()">💾 Save Question</button>
+        <button class="btn btn-secondary" onclick="clearForm()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GENERATE PANEL ══ -->
+  <div class="panel" id="panel-generate">
+    <div class="card">
+      <div class="card-title">Generate Test</div>
+
+      <!-- Scramble options -->
+      <div class="scramble-row">
+        <label class="toggle-item"><input type="checkbox" id="scrambleOrder" /><span>🔀 Randomize question order</span></label>
+        <label class="toggle-item"><input type="checkbox" id="scrambleChoices" /><span>🔀 Randomize answer choices (MC)</span></label>
+      </div>
+
+      <div class="gen-options">
+        <div class="gen-option"><label>Test Title</label><input type="text" id="testTitle" placeholder="AP Psychology Practice Test" /></div>
+        <div class="gen-option">
+          <label>Source</label>
+          <select id="genSource" onchange="updateGenSource()">
+            <option value="selected">Use selected questions</option>
+            <option value="all">All questions</option>
+            <option value="unit">By unit</option>
+            <option value="random">Random sample</option>
+          </select>
+        </div>
+        <div class="gen-option" id="genCountWrap" style="display:none;"><label>Number of Questions</label><input type="number" id="genNum" value="20" min="1" max="200" /></div>
+        <div class="gen-option" id="genUnitWrap" style="display:none;"><label>Unit</label><select id="genUnit"></select></div>
+        <div class="gen-option" id="genDiffWrap">
+          <label>Filter by Difficulty</label>
+          <select id="genDiff">
+            <option value="">Any difficulty</option>
+            <option>Easy</option><option>Medium</option><option>Hard</option>
+          </select>
+        </div>
+        <div class="gen-option">
+          <label>Include Answer Key</label>
+          <select id="genAnswerKey">
+            <option value="yes">Yes — at the end</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="generateTest()">👁 Preview Test</button>
+        <button class="btn btn-success" onclick="printTest()">🖨 Print / Save as PDF</button>
+      </div>
+    </div>
+    <div id="testPreview"></div>
+  </div>
+
+</div><!-- end .main -->
+
+<script>
+// ─────────────────────────────────────────────
+//  STORAGE
+// ─────────────────────────────────────────────
+const STORAGE_KEY = 'appsych_testbank_v2';
+function loadData(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[];}catch{return[];}}
+function saveData(){localStorage.setItem(STORAGE_KEY,JSON.stringify(questions));}
+
+let questions = loadData();
+let selectedIds = new Set();
+
+if(questions.length===0){
+  questions=[
+    {id:1,type:"multiple_choice",text:"Which neurotransmitter is most associated with the regulation of mood, appetite, and sleep?",unit:"Unit 1 – Biological Bases of Behavior",difficulty:"Easy",choices:["Dopamine","Serotonin","Acetylcholine","GABA"],correct:"B",explanation:"Serotonin regulates mood, sleep, and appetite. Low serotonin is associated with depression."},
+    {id:2,type:"multiple_choice",text:"During an action potential, sodium ions rush into the neuron, making the interior briefly positive. This phase is called:",unit:"Unit 1 – Biological Bases of Behavior",difficulty:"Medium",choices:["Hyperpolarization","Resting potential","Depolarization","Refractory period"],correct:"C",explanation:"Depolarization occurs when Na⁺ channels open and sodium floods in, driving membrane potential from –70 mV to about +40 mV."},
+    {id:3,type:"multiple_choice",text:"The myelin sheath speeds neural transmission by:",unit:"Unit 1 – Biological Bases of Behavior",difficulty:"Medium",choices:["Increasing neurotransmitter release","Insulating the axon so the signal jumps between nodes of Ranvier","Preventing reuptake at the synapse","Adding more receptor sites to dendrites"],correct:"B",explanation:"Saltatory conduction — the signal jumping from node to node — dramatically increases transmission speed."},
+    {id:4,type:"multiple_choice",text:"In Piaget's theory, incorporating new information into existing schemas is called:",unit:"Unit 3 – Development and Learning",difficulty:"Medium",choices:["Accommodation","Assimilation","Equilibration","Conservation"],correct:"B",explanation:"Assimilation fits new info into existing schemas; accommodation involves changing those schemas."},
+    {id:5,type:"multiple_choice",text:"The amygdala plays a central role in:",unit:"Unit 1 – Biological Bases of Behavior",difficulty:"Medium",choices:["Coordinating fine motor movements","Processing fear, aggression, and emotional memory","Relaying sensory info to the cortex","Regulating hunger and thirst"],correct:"B",explanation:"The amygdala processes emotional responses — especially fear — and encodes emotionally significant memories."},
+    {id:6,type:"multiple_choice",text:"The bystander effect occurs when:",unit:"Unit 4 – Social Psychology and Personality",difficulty:"Medium",choices:["People conform under group pressure","Individuals are less likely to help when others are present","People obey authority even when causing harm","Aggression increases in large crowds"],correct:"B",explanation:"Diffusion of responsibility: the more bystanders present, the less any individual feels personally obligated to help."},
+    {id:7,type:"multiple_choice",text:"According to Freud, the part of the psyche that operates on the pleasure principle is the:",unit:"Unit 4 – Social Psychology and Personality",difficulty:"Medium",choices:["Superego","Ego","Id","Preconscious"],correct:"C",explanation:"The id seeks immediate gratification with no regard for reality or morality."},
+    {id:8,type:"multiple_choice",text:"Weber's Law states that the just noticeable difference (JND) is:",unit:"Unit 1 – Biological Bases of Behavior",difficulty:"Hard",choices:["A fixed absolute amount regardless of stimulus size","A constant proportion of the original stimulus intensity","Determined by the observer's response criterion","Equal for all sensory modalities"],correct:"B",explanation:"The JND is a constant fraction of the original stimulus — if you can detect a 2% weight change at 100 g, you need a 20 g change at 1,000 g."},
+    {id:9,type:"multiple_choice",text:"Milgram's obedience studies showed that obedience rates were HIGHEST when:",unit:"Unit 4 – Social Psychology and Personality",difficulty:"Medium",choices:["The experimenter was absent from the room","The learner was in the same room as the participant","The experimenter was physically present and gave direct orders","Other participants refused to continue"],correct:"C",explanation:"Physical presence of the authority figure and direct commands produced ~65% obedience rates."},
+    {id:10,type:"multiple_choice",text:"Which memory system has theoretically unlimited capacity and can store information indefinitely?",unit:"Unit 2 – Cognition",difficulty:"Easy",choices:["Sensory memory","Short-term memory","Working memory","Long-term memory"],correct:"D",explanation:"Long-term memory has vast, potentially unlimited capacity and can retain information for a lifetime."},
+    {id:11,type:"multiple_choice",text:"A therapist helps a client replace 'I always fail at everything' with more balanced thinking. This approach is most consistent with:",unit:"Unit 5 – Mental and Physical Health",difficulty:"Easy",choices:["Psychoanalysis","Client-centered therapy","Cognitive-behavioral therapy","Systematic desensitization"],correct:"C",explanation:"CBT targets maladaptive thought patterns (like overgeneralization) and replaces them with more accurate, balanced cognitions."},
+    {id:12,type:"multiple_choice",text:"A variable-ratio reinforcement schedule produces the highest response rates because:",unit:"Unit 3 – Development and Learning",difficulty:"Hard",choices:["Reinforcement is predictable, encouraging steady effort","Unpredictable reinforcement keeps behavior resistant to extinction","The interval between reinforcements is fixed and short","Partial reinforcement is less motivating than continuous reinforcement"],correct:"B",explanation:"Like a slot machine, unpredictable rewards maintain high, persistent responding and make extinction very slow."},
+    {id:13,type:"multiple_choice",text:"A researcher finds a correlation of r = +0.62 between extraversion and social media use. The most accurate interpretation is:",unit:"Unit 4 – Social Psychology and Personality",difficulty:"Hard",choices:["Extraversion causes increased social media use","There is a moderate positive relationship between the two variables","Social media use causes people to become more extraverted","62% of variance in social media use is explained by extraversion"],correct:"B",explanation:"Correlation shows a relationship, not causation. r² (≈38%, not 62%) represents shared variance."},
+    {id:14,type:"multiple_choice",text:"A double-blind procedure in drug research controls for:",unit:"Unit 5 – Mental and Physical Health",difficulty:"Medium",choices:["Selection bias through random sampling","Operational definition errors","Both the placebo effect and experimenter bias","Ethical violations regarding informed consent"],correct:"C",explanation:"Neither participants nor researchers know who got the real drug, preventing both placebo-driven and experimenter-bias-driven effects on outcomes."},
+    {id:15,type:"multiple_choice",text:"The DSM-5 is primarily used for:",unit:"Unit 5 – Mental and Physical Health",difficulty:"Easy",choices:["Prescribing psychiatric medication","Classifying psychological disorders using standardized diagnostic criteria","Measuring intelligence quotients","Conducting brain imaging studies"],correct:"B",explanation:"The DSM-5 provides standardized criteria for identifying and classifying mental disorders."},
+    {id:16,type:"essay",text:"Explain how the sympathetic and parasympathetic divisions of the autonomic nervous system work together to maintain homeostasis. Provide a specific example of each division's role in a stress response and recovery.",unit:"Unit 1 – Biological Bases of Behavior",difficulty:"Medium",rubric:"Award credit for: accurate description of sympathetic fight-or-flight (increased HR, pupil dilation, glucose release); accurate description of parasympathetic rest-and-digest (decreased HR, stimulates digestion); clear example illustrating both phases; mention of homeostasis as the goal."},
+    {id:17,type:"essay",text:"Describe the role of the hippocampus in memory. Using at least one real-world example or study (e.g., H.M.), explain what happens to memory when the hippocampus is damaged.",unit:"Unit 1 – Biological Bases of Behavior",difficulty:"Hard",rubric:"Award credit for: hippocampus role in encoding new explicit memories; anterograde vs. retrograde amnesia distinction; accurate description of H.M. or similar case; implicit/procedural memory remaining intact; implications for understanding memory systems."},
+    {id:18,type:"essay",text:"Compare and contrast classical conditioning and operant conditioning. For each, provide an original example (not from the textbook) and identify the key components (e.g., UCS, UCR, CS, CR for classical; reinforcer/punisher type for operant).",unit:"Unit 3 – Development and Learning",difficulty:"Hard",rubric:"Award credit for: accurate definition of each; correct identification of components with original examples; comparison noting classical = involuntary/reflexive, operant = voluntary/consequence-driven; may discuss Pavlov and Skinner as theorists."},
+    {id:19,type:"multiple_choice",text:"Seligman's positive psychology movement focuses on:",unit:"Unit 5 – Mental and Physical Health",difficulty:"Easy",choices:["Identifying unconscious conflicts causing anxiety","Eliminating maladaptive cognitions through behavioral therapy","Studying strengths, virtues, and factors that allow individuals to flourish","Using classical conditioning to eliminate phobic responses"],correct:"C",explanation:"Positive psychology shifts focus from treating illness to understanding well-being, resilience, and human strengths (PERMA model)."},
+    {id:20,type:"multiple_choice",text:"OCD (Obsessive-Compulsive Disorder) is characterized by:",unit:"Unit 5 – Mental and Physical Health",difficulty:"Easy",choices:["Chronic, uncontrollable worry across many life areas","Intrusive obsessions and repetitive compulsions that temporarily relieve anxiety","Sudden, intense panic attacks with physical symptoms","Physical complaints without an identifiable medical cause"],correct:"B",explanation:"OCD involves unwanted intrusive thoughts (obsessions) and repetitive behaviors (compulsions) performed to reduce the anxiety they cause."},
+    {id:21,type:"multiple_choice",text:"A study without random assignment finds that people who exercise report lower depression. The biggest limitation is:",unit:"Unit 5 – Mental and Physical Health",difficulty:"Hard",choices:["Sample size is likely too small","A third variable (e.g., motivation) could explain both exercise and lower depression","Self-report measures of depression are never valid","A placebo group is required in all psychological studies"],correct:"A",explanation:"Without random assignment, pre-existing differences between exercisers and non-exercisers (third variables) could explain the correlation rather than exercise itself."},
+    {id:22,type:"multiple_choice",text:"The serial position effect refers to better recall for:",unit:"Unit 2 – Cognition",difficulty:"Medium",choices:["Items studied with the spacing effect","Items at the beginning and end of a list","Items encoded with elaborative rehearsal","Items studied in the same context as the test"],correct:"B",explanation:"Primacy effect (beginning) and recency effect (end) produce better recall than for items in the middle of a list."},
+    {id:23,type:"multiple_choice",text:"The misinformation effect (Loftus) demonstrates that:",unit:"Unit 2 – Cognition",difficulty:"Medium",choices:["Memory is a perfect recording of experienced events","Post-event information can alter the content of existing memories","Emotional events are always remembered more accurately","Eyewitness testimony is the most reliable form of legal evidence"],correct:"B",explanation:"Leading questions and post-event suggestions can change what witnesses remember — memory is reconstructive, not reproductive."},
+    {id:24,type:"multiple_choice",text:"The levels of processing model predicts that ______ encoding produces the best long-term retention.",unit:"Unit 2 – Cognition",difficulty:"Medium",choices:["Structural (e.g., analyzing font)","Phonemic (e.g., rhyming the word)","Semantic (e.g., connecting word to personal meaning)","Implicit (e.g., unintentional exposure)"],correct:"C",explanation:"Deep, meaningful (semantic) processing creates stronger, more durable memory traces than shallow structural or phonemic processing."},
+    {id:25,type:"multiple_choice",text:"The prefrontal cortex continues developing until the mid-20s. This best explains why adolescents:",unit:"Unit 1 – Biological Bases of Behavior",difficulty:"Medium",choices:["Have stronger emotional responses than adults","Are better at spatial reasoning than older adults","Struggle more with impulse control and long-term planning","Show greater neuroplasticity than children"],correct:"C",explanation:"The prefrontal cortex governs executive function. Its late maturation means adolescents have a fully developed limbic/reward system but incomplete top-down control — contributing to impulsivity and risk-taking."},
+    {id:26,type:"multiple_choice",text:"A survey about cheating behavior finds most students say they never cheat. This likely reflects:",unit:"Unit 4 – Social Psychology and Personality",difficulty:"Medium",choices:["Experimenter bias in survey design","Social desirability bias — answering in ways seen as socially acceptable","Selection bias — only honest students participated","A directionality problem in the correlation"],correct:"B",explanation:"Social desirability bias causes respondents to underreport socially unacceptable behaviors and overreport virtuous ones."},
+    {id:27,type:"multiple_choice",text:"Bandura's Bobo doll experiment demonstrated that children can learn aggressive behavior through:",unit:"Unit 3 – Development and Learning",difficulty:"Easy",choices:["Classical conditioning of fear responses","Negative reinforcement of aggressive acts","Observational learning by watching a model","Shaping — gradual reinforcement toward target behavior"],correct:"C",explanation:"Children who watched an adult hit the Bobo doll imitated that aggression when given the chance — demonstrating observational (social) learning without direct reinforcement."},
+    {id:28,type:"multiple_choice",text:"A researcher randomly assigns participants to either a caffeine or placebo condition, then measures reaction time. The independent variable in this study is:",unit:"Unit 0 – Research Methods",difficulty:"Easy",choices:["Reaction time","Whether participants consumed caffeine or placebo","The number of participants in each group","The reaction time difference between groups"],correct:"B",explanation:"The independent variable is what the researcher manipulates — here, the caffeine vs. placebo condition. Reaction time is the dependent variable."},
+    {id:29,type:"multiple_choice",text:"A psychologist studying whether childhood trauma predicts adult anxiety cannot use a true experiment because:",unit:"Unit 0 – Research Methods",difficulty:"Medium",choices:["Self-report measures are too unreliable for this topic","It would be unethical to randomly assign children to experience trauma","The sample size needed would be too large","Anxiety cannot be operationally defined"],correct:"B",explanation:"Random assignment to 'trauma' vs. 'no trauma' conditions would be unethical. This forces a correlational or quasi-experimental design."},
+    {id:30,type:"multiple_choice",text:"In a study on study habits, students who use flashcards score an average of 12 points higher on exams (SD = 4) than those who reread notes (SD = 5). The most appropriate conclusion is:",unit:"Unit 0 – Research Methods",difficulty:"Hard",choices:["Flashcards cause higher exam scores","Flashcard users are more intelligent","There is a large effect size difference between the groups","The difference is statistically significant at p < .05"],correct:"C",explanation:"Without inferential statistics we cannot claim significance or causation. We can note the effect size — a 12-point difference with small SDs suggests a meaningfully large difference."},
+    {id:31,type:"multiple_choice",text:"The American Psychological Association (APA) requires informed consent primarily to:",unit:"Unit 0 – Research Methods",difficulty:"Easy",choices:["Increase participant motivation to perform well","Ensure participants understand and voluntarily agree to study procedures","Reduce the cost of recruiting research participants","Eliminate the need for debriefing at the end of the study"],correct:"B",explanation:"Informed consent protects participant autonomy by ensuring they understand what they're agreeing to before the study begins."},
+    {id:32,type:"multiple_choice",text:"A naturalistic observation study of children on a playground has high ecological validity but low internal validity. This trade-off exists because:",unit:"Unit 0 – Research Methods",difficulty:"Medium",choices:["Observer effect inflates results","The researcher cannot control extraneous variables that could explain behavior","Naturalistic observation always uses small samples","Children's behavior is not representative of adults"],correct:"B",explanation:"High ecological validity (real-world setting) comes at the cost of experimental control — without controlling variables, causal conclusions are impossible."},
+    {id:33,type:"multiple_choice",text:"Operational definitions are used in research primarily to:",unit:"Unit 0 – Research Methods",difficulty:"Easy",choices:["Simplify statistical analysis","Make abstract constructs measurable and replicable","Remove the need for a control group","Increase the placebo effect"],correct:"B",explanation:"An operational definition specifies exactly how a variable will be measured (e.g., 'stress' = salivary cortisol level), allowing replication and objective comparison."},
+    {id:34,type:"multiple_choice",text:"A poll asks 10,000 visitors to a news website to rate their happiness. This sampling method is most likely to produce results that are:",unit:"Unit 0 – Research Methods",difficulty:"Medium",choices:["Highly reliable and generalizable to all adults","Biased because self-selected samples overrepresent people with strong opinions","Valid because of the large sample size","Free from social desirability bias"],correct:"B",explanation:"Volunteer/self-selected samples suffer from self-selection bias — those who respond differ systematically from those who don't, regardless of sample size."},
+    {id:35,type:"multiple_choice",text:"A researcher finds r = –0.78 between hours of sleep and number of errors on a task. Which statement is best supported?",unit:"Unit 0 – Research Methods",difficulty:"Medium",choices:["Lack of sleep directly causes more errors","More errors at work cause people to sleep less","There is a strong negative relationship between sleep and errors","The correlation explains 78% of the variation in errors"],correct:"C",explanation:"r = –0.78 indicates a strong negative correlation — as sleep decreases, errors tend to increase. Correlation does not establish causation, and r² (not r) represents explained variance (~61%)."},
+    {id:36,type:"essay",text:"A school administrator claims that students who participate in after-school sports have better grades. Design a study to test this claim. In your response, (a) identify whether you would use an experimental or correlational design and explain why, (b) describe a potential confounding variable and how you would address it, and (c) explain what ethical guidelines you would need to follow.",unit:"Unit 0 – Research Methods",difficulty:"Hard",rubric:"Award credit for: (a) identifying correlational (cannot ethically/practically randomly assign sports participation) OR experimental with appropriate rationale; (b) naming a valid confounder (e.g., motivation, SES, parental involvement) and a method to control it (matching, random assignment, statistical control); (c) mentioning informed consent, right to withdraw, confidentiality, IRB approval, and/or debriefing; clear logical organization throughout."}
+  ];
+  saveData();
+}
+
+let nextId = questions.reduce((max,q)=>Math.max(max,q.id),0)+1;
+
+// ─────────────────────────────────────────────
+//  NAV
+// ─────────────────────────────────────────────
+function switchTab(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  ['bank','add','generate'].forEach((n,i)=>{if(n===name)document.querySelectorAll('.nav-tab')[i].classList.add('active');});
+  if(name==='bank')renderBank();
+  if(name==='generate')populateGenUnits();
+}
+
+function updateStats(){
+  document.getElementById('totalCount').textContent=questions.length;
+  document.getElementById('unitCount').textContent=new Set(questions.map(q=>q.unit)).size;
+  document.getElementById('selectedCount').textContent=selectedIds.size;
+  const n=selectedIds.size;
+  document.getElementById('genCount').textContent=n;
+  document.getElementById('generateBtn').style.display=n>0?'inline-flex':'none';
+}
+
+// ─────────────────────────────────────────────
+//  BANK
+// ─────────────────────────────────────────────
+function renderBank(){
+  populateUnitFilter();
+  const search=document.getElementById('searchInput').value.toLowerCase();
+  const unit=document.getElementById('filterUnit').value;
+  const diff=document.getElementById('filterDiff').value;
+  const qtype=document.getElementById('filterType').value;
+  const showAns=document.getElementById('showAnswers').checked;
+  const letters=['A','B','C','D'];
+
+  let filtered=questions.filter(q=>{
+    if(unit&&q.unit!==unit)return false;
+    if(diff&&q.difficulty!==diff)return false;
+    if(qtype&&(q.type||'multiple_choice')!==qtype)return false;
+    if(search&&!q.text.toLowerCase().includes(search)&&!(q.choices||[]).join(' ').toLowerCase().includes(search))return false;
+    return true;
+  });
+
+  document.getElementById('resultsCount').textContent=`${filtered.length} question${filtered.length!==1?'s':''}`;
+  const list=document.getElementById('bankList');
+
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">No questions found</div></div>`;
+    updateStats();return;
+  }
+
+  list.innerHTML=filtered.map((q,i)=>{
+    const sel=selectedIds.has(q.id);
+    const isEssay=(q.type||'multiple_choice')==='essay';
+    const diffCls='badge-'+q.difficulty.toLowerCase();
+    const choicesHtml=isEssay
+      ?`<div style="font-size:13px;color:var(--gray-500);font-style:italic;margin-bottom:8px;">Essay / Free response</div>`
+      :`<div class="q-choices">${(q.choices||[]).map((c,ci)=>{
+          const isC=q.correct===letters[ci];
+          return `<div class="q-choice${isC&&showAns?' correct':''}"><span class="q-choice-marker">${letters[ci]}.</span> ${esc(c)}${isC&&showAns?' ✓':''}</div>`;
+        }).join('')}</div>`;
+    const infoHtml=showAns&&q.explanation?`<div style="font-size:12px;color:var(--gray-500);margin-top:6px;padding:8px;background:var(--gray-50);border-radius:6px;">💡 ${esc(q.explanation)}</div>`
+      :showAns&&isEssay&&q.rubric?`<div style="font-size:12px;color:var(--gray-500);margin-top:6px;padding:8px;background:var(--purple-light);border-radius:6px;">📝 ${esc(q.rubric)}</div>`:'';
+
+    return `<div class="q-card${sel?' selected':''}" id="qcard-${q.id}">
+      <div class="q-header">
+        <div class="q-num">${i+1}.</div>
+        <div class="q-text">${esc(q.text)}</div>
+        <input type="checkbox" class="select-checkbox"${sel?' checked':''} onchange="toggleSelect(${q.id})" />
+      </div>
+      <div class="q-meta">
+        <span class="badge badge-unit">${esc(q.unit)}</span>
+        <span class="badge ${diffCls}">${q.difficulty}</span>
+        ${isEssay?'<span class="badge badge-essay">Essay</span>':''}
+      </div>
+      ${q.image?`<img src="${q.image}" class="q-image" alt="question image"/>`:''} 
+      ${choicesHtml}${infoHtml}
+      <div class="q-actions">
+        <button class="btn btn-secondary btn-sm" onclick="editQuestion(${q.id})">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteQuestion(${q.id})">🗑 Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+  updateStats();
+}
+
+function populateUnitFilter(){
+  const sel=document.getElementById('filterUnit');
+  const curr=sel.value;
+  const units=[...new Set(questions.map(q=>q.unit))].sort();
+  sel.innerHTML='<option value="">All Units</option>'+units.map(u=>`<option${u===curr?' selected':''}>${esc(u)}</option>`).join('');
+}
+
+function toggleSelect(id){
+  selectedIds.has(id)?selectedIds.delete(id):selectedIds.add(id);
+  document.getElementById('qcard-'+id)?.classList.toggle('selected',selectedIds.has(id));
+  updateStats();
+}
+function selectAll(){
+  const s=document.getElementById('searchInput').value.toLowerCase();
+  const u=document.getElementById('filterUnit').value;
+  const d=document.getElementById('filterDiff').value;
+  questions.filter(q=>(!u||q.unit===u)&&(!d||q.difficulty===d)&&(!s||q.text.toLowerCase().includes(s))).forEach(q=>selectedIds.add(q.id));
+  renderBank();
+}
+function deselectAll(){selectedIds.clear();renderBank();}
+
+// ─────────────────────────────────────────────
+//  FORM
+// ─────────────────────────────────────────────
+let currentImageData=null;
+
+function handleImageUpload(file){
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    currentImageData=e.target.result;
+    document.getElementById('imgPreview').src=currentImageData;
+    document.getElementById('imgPreviewWrap').style.display='block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImage(){
+  currentImageData=null;
+  document.getElementById('imgPreview').src='';
+  document.getElementById('imgPreviewWrap').style.display='none';
+  document.getElementById('qImageInput').value='';
+}
+
+function onTypeChange(){
+  const isEssay=document.getElementById('qType').value==='essay';
+  document.getElementById('choicesSection').style.display=isEssay?'none':'block';
+  document.getElementById('explanationSection').style.display=isEssay?'none':'block';
+  document.getElementById('rubricSection').style.display=isEssay?'block':'none';
+}
+
+function saveQuestion(){
+  const text=document.getElementById('qText').value.trim();
+  const unit=document.getElementById('qUnit').value;
+  const diff=document.getElementById('qDiff').value;
+  const type=document.getElementById('qType').value;
+  if(!text)return toast('Please enter a question.','error');
+  if(!unit)return toast('Please select a unit.','error');
+  if(!diff)return toast('Please select a difficulty.','error');
+
+  const q={type,text,unit,difficulty:diff};
+  if(type==='essay'){
+    q.rubric=document.getElementById('qRubric').value.trim();
+  } else {
+    const choices=['A','B','C','D'].map(l=>document.getElementById('choice'+l).value.trim());
+    const correct=(document.querySelector('input[name="correct"]:checked')||{}).value;
+    if(choices.some(c=>!c))return toast('Please fill in all 4 answer choices.','error');
+    if(!correct)return toast('Please select the correct answer.','error');
+    q.choices=choices;q.correct=correct;
+    q.explanation=document.getElementById('qExplanation').value.trim();
+  }
+
+  // image: keep existing when editing if no new upload; allow null to remove
+  if(currentImageData!==undefined)q.image=currentImageData;
+  const editId=document.getElementById('editId').value;
+  if(editId){
+    const existing=questions.find(x=>x.id===+editId)||{};
+    // if user didn't change image (currentImageData still equals existing.image), preserve it
+    if(q.image===existing.image){}  // no-op, already equal
+    Object.assign(existing,q);
+    toast('Question updated!','success');
+  }
+  else{questions.push({id:nextId++,...q});toast('Question added!','success');}
+  saveData();clearForm();updateStats();
+}
+
+function clearForm(){
+  ['editId','qText','qExplanation','qRubric'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('qType').value='multiple_choice';
+  document.getElementById('qUnit').value='';
+  document.getElementById('qDiff').value='';
+  ['A','B','C','D'].forEach(l=>document.getElementById('choice'+l).value='');
+  document.querySelectorAll('input[name="correct"]').forEach(r=>r.checked=false);
+  document.getElementById('formTitle').textContent='Add New Question';
+  clearImage();
+  onTypeChange();
+}
+
+function editQuestion(id){
+  const q=questions.find(x=>x.id===id);if(!q)return;
+  switchTab('add');
+  document.getElementById('editId').value=id;
+  document.getElementById('formTitle').textContent='Edit Question';
+  document.getElementById('qType').value=q.type||'multiple_choice';
+  document.getElementById('qText').value=q.text;
+  document.getElementById('qUnit').value=q.unit;
+  document.getElementById('qDiff').value=q.difficulty;
+  onTypeChange();
+  if((q.type||'multiple_choice')==='multiple_choice'){
+    ['A','B','C','D'].forEach((l,i)=>document.getElementById('choice'+l).value=(q.choices||[])[i]||'');
+    const r=document.querySelector(`input[name="correct"][value="${q.correct}"]`);
+    if(r)r.checked=true;
+    document.getElementById('qExplanation').value=q.explanation||'';
+  } else {
+    document.getElementById('qRubric').value=q.rubric||'';
+  }
+  // Load existing image
+  clearImage();
+  if(q.image){currentImageData=q.image;document.getElementById('imgPreview').src=q.image;document.getElementById('imgPreviewWrap').style.display='block';}
+}
+
+function deleteQuestion(id){
+  if(!confirm('Delete this question?'))return;
+  questions=questions.filter(q=>q.id!==id);selectedIds.delete(id);
+  saveData();renderBank();toast('Question deleted.','');
+}
+
+// ─────────────────────────────────────────────
+//  CSV IMPORT
+// ─────────────────────────────────────────────
+function parseCSV(text){
+  const rows=[];
+  for(const line of text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n')){
+    if(!line.trim())continue;
+    const row=[];let field='',inQ=false;
+    for(let i=0;i<line.length;i++){
+      const ch=line[i];
+      if(inQ){if(ch==='"'&&line[i+1]==='"'){field+='"';i++;}else if(ch==='"'){inQ=false;}else field+=ch;}
+      else{if(ch==='"')inQ=true;else if(ch===','){row.push(field.trim());field='';}else field+=ch;}
+    }
+    row.push(field.trim());rows.push(row);
+  }
+  return rows;
+}
+
+function importCSV(file){
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const rows=parseCSV(e.target.result);
+    if(rows.length<2){toast('CSV has no data rows.','error');return;}
+    const first=rows[0].map(c=>c.toLowerCase());
+    const hasHeader=first.some(c=>['question_text','text','question','type'].includes(c));
+    const data=hasHeader?rows.slice(1):rows;
+    let imported=0,skipped=0;
+    for(const r of data){
+      if(!r[0]){skipped++;continue;}
+      const [qtext,unit,difficulty,type,a,b,c,d,correct,explanation]=r;
+      const qtype=(type||'').toLowerCase().trim()==='essay'?'essay':'multiple_choice';
+      const diff=['Easy','Medium','Hard'].includes((difficulty||'').trim())?difficulty.trim():'Medium';
+      const q={id:nextId++,type:qtype,text:(qtext||'').trim(),unit:(unit||'Unit 1 – Biological Bases of Behavior').trim(),difficulty:diff};
+      if(qtype==='essay'){
+        q.rubric=(explanation||'').trim();
+      } else {
+        if(!a||!b||!c||!d){skipped++;nextId--;continue;}
+        q.choices=[(a||'').trim(),(b||'').trim(),(c||'').trim(),(d||'').trim()];
+        q.correct=(correct||'').trim().toUpperCase();
+        if(!['A','B','C','D'].includes(q.correct)){skipped++;nextId--;continue;}
+        q.explanation=(explanation||'').trim();
+      }
+      questions.push(q);imported++;
+    }
+    saveData();renderBank();
+    toast(`Imported ${imported} question${imported!==1?'s':''}${skipped?` (${skipped} skipped)`:''}`,imported>0?'success':'error');
+    document.getElementById('csvFileInput').value='';
+  };
+  reader.readAsText(file);
+}
+
+function downloadTemplate(){
+  const csv=`"question_text","unit","difficulty","type","choice_a","choice_b","choice_c","choice_d","correct","explanation"
+"Which lobe processes visual information?","Unit 1 – Biological Bases of Behavior","Easy","multiple_choice","Frontal lobe","Temporal lobe","Parietal lobe","Occipital lobe","D","The occipital lobe contains the primary visual cortex."
+"Describe the role of the hippocampus in memory formation.","Unit 1 – Biological Bases of Behavior","Hard","essay","","","","","","Look for: encoding new explicit memories; anterograde amnesia; H.M. case study."`;
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='ap_psych_import_template.csv';a.click();
+}
+
+// ─────────────────────────────────────────────
+//  GENERATE
+// ─────────────────────────────────────────────
+function populateGenUnits(){
+  const sel=document.getElementById('genUnit');
+  const units=[...new Set(questions.map(q=>q.unit))].sort();
+  sel.innerHTML=units.map(u=>`<option>${esc(u)}</option>`).join('');
+}
+
+function updateGenSource(){
+  const src=document.getElementById('genSource').value;
+  document.getElementById('genCountWrap').style.display=src==='random'?'block':'none';
+  document.getElementById('genUnitWrap').style.display=src==='unit'?'block':'none';
+}
+
+function getPool(){
+  const src=document.getElementById('genSource').value;
+  const diff=document.getElementById('genDiff').value;
+  let pool=questions.filter(q=>!diff||q.difficulty===diff);
+  if(src==='selected')pool=pool.filter(q=>selectedIds.has(q.id));
+  else if(src==='unit'){const u=document.getElementById('genUnit').value;pool=pool.filter(q=>q.unit===u);}
+  else if(src==='random'){const n=parseInt(document.getElementById('genNum').value)||20;pool=shuffle(pool).slice(0,n);}
+  if(document.getElementById('scrambleOrder').checked)pool=shuffle(pool);
+  return pool;
+}
+
+function applyChoiceScramble(q){
+  if((q.type||'multiple_choice')==='essay')return q;
+  const letters=['A','B','C','D'];
+  const objs=(q.choices||[]).map((t,i)=>({t,correct:letters[i]===q.correct}));
+  const sh=shuffle(objs);
+  return{...q,choices:sh.map(o=>o.t),correct:letters[sh.findIndex(o=>o.correct)]};
+}
+
+function generateTest(){
+  let pool=getPool();
+  if(!pool.length){toast('No questions match those criteria.','error');return;}
+  const doScrambleC=document.getElementById('scrambleChoices').checked;
+  if(doScrambleC)pool=pool.map(applyChoiceScramble);
+  const showKey=document.getElementById('genAnswerKey').value==='yes';
+  const title=document.getElementById('testTitle').value||'AP Psychology Practice Test';
+  const letters=['A','B','C','D'];
+  const mcqs=pool.filter(q=>(q.type||'multiple_choice')==='multiple_choice');
+  const essays=pool.filter(q=>(q.type||'multiple_choice')==='essay');
+
+  let html=`<div class="card"><div class="card-title" style="font-size:18px;">${esc(title)}</div>
+    <div style="font-size:13px;color:var(--gray-500);margin-bottom:20px;">${pool.length} questions — ${mcqs.length} multiple choice, ${essays.length} essay</div>`;
+  pool.forEach((q,i)=>{
+    const isEssay=(q.type||'multiple_choice')==='essay';
+    html+=`<div class="q-card" style="border-left-color:var(--primary);">
+      <div class="q-header"><div class="q-num">${i+1}.</div><div class="q-text">${esc(q.text)}</div></div>
+      <div class="q-meta"><span class="badge badge-unit">${esc(q.unit)}</span><span class="badge badge-${q.difficulty.toLowerCase()}">${q.difficulty}</span>${isEssay?'<span class="badge badge-essay">Essay</span>':''}</div>`;
+    if(q.image)html+=`<img src="${q.image}" class="q-image" alt="question image"/>`;
+    if(isEssay){html+=`<div style="font-size:13px;color:var(--gray-500);font-style:italic;">Written response required</div>`;}
+    else{html+=`<div class="q-choices">${(q.choices||[]).map((c,ci)=>`<div class="q-choice"><span class="q-choice-marker">${letters[ci]}.</span> ${esc(c)}</div>`).join('')}</div>`;}
+    html+=`</div>`;
+  });
+  if(showKey&&mcqs.length){
+    const keyed=pool.map((q,i)=>({...q,num:i+1})).filter(q=>(q.type||'multiple_choice')==='multiple_choice');
+    html+=`<div style="margin-top:24px;padding-top:16px;border-top:2px solid var(--gray-200);">
+      <div class="card-title">Answer Key</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;">
+      ${keyed.map(q=>`<div style="font-size:13px;padding:5px 8px;background:var(--green-light);border-radius:6px;color:var(--green);font-weight:500;">${q.num}. ${q.correct}</div>`).join('')}
+      </div></div>`;
+  }
+  html+=`</div>`;
+  document.getElementById('testPreview').innerHTML=html;
+  buildPrint(pool,title,showKey);
+  toast('Test ready! Use Print / Save as PDF to export.','success');
+}
+
+function buildPrint(pool,title,showKey){
+  const letters=['A','B','C','D'];
+  const mcqs=pool.filter(q=>(q.type||'multiple_choice')==='multiple_choice');
+  const essays=pool.filter(q=>(q.type||'multiple_choice')==='essay');
+  let html=`<div class="print-header">
+    <div class="print-title">${esc(title)}</div>
+    <div class="print-meta">Name: __________________________ &nbsp; Date: ____________ &nbsp; Score: _____/${mcqs.length} MC &nbsp; _____/${essays.length} Essay</div>
+  </div>`;
+  pool.forEach((q,i)=>{
+    const isEssay=(q.type||'multiple_choice')==='essay';
+    html+=`<div class="print-q"><div class="print-q-text">${i+1}. ${esc(q.text)}</div>`;
+    if(q.image)html+=`<img src="${q.image}" class="print-q-image" alt="question image"/>`;
+    if(isEssay){
+      html+=`<div class="print-essay-lines"><div class="print-essay-line"></div><div class="print-essay-line"></div><div class="print-essay-line"></div><div class="print-essay-line"></div></div>`;
+    } else {
+      html+=`<div class="print-choices">${(q.choices||[]).map((c,ci)=>`<div class="print-choice">${letters[ci]}) ${esc(c)}</div>`).join('')}</div>`;
+    }
+    html+=`</div>`;
+  });
+  if(showKey&&mcqs.length){
+    const keyed=pool.map((q,i)=>({...q,num:i+1})).filter(q=>(q.type||'multiple_choice')==='multiple_choice');
+    html+=`<div class="print-answer-key"><strong>Answer Key:</strong> ${keyed.map(q=>`${q.num}. ${q.correct}`).join(' &nbsp; ')}</div>`;
+  }
+  document.getElementById('printArea').innerHTML=html;
+}
+
+function printTest(){
+  let pool=getPool();
+  if(!pool.length){toast('No questions match those criteria.','error');return;}
+  if(document.getElementById('scrambleChoices').checked)pool=pool.map(applyChoiceScramble);
+  buildPrint(pool,document.getElementById('testTitle').value||'AP Psychology Practice Test',document.getElementById('genAnswerKey').value==='yes');
+  window.print();
+}
+
+// ─────────────────────────────────────────────
+//  UTILS
+// ─────────────────────────────────────────────
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=0|Math.random()*(i+1);[b[i],b[j]]=[b[j],b[i]];}return b;}
+let _tt;
+function toast(msg,type){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(type?' '+type:'');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2800);}
+
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+renderBank();populateGenUnits();
+</script>
+</body>
+</html>
