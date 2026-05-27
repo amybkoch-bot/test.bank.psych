@@ -210,6 +210,7 @@
   <div class="nav-tab active" onclick="switchTab('bank')">📋 Question Bank</div>
   <div class="nav-tab" onclick="switchTab('add')">➕ Add Question</div>
   <div class="nav-tab" onclick="switchTab('generate')">📄 Generate Test</div>
+  <div class="nav-tab" onclick="switchTab('saved')">📁 Saved Tests</div>
 </div>
 
 <div class="main">
@@ -371,12 +372,23 @@
           </select>
         </div>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
         <button class="btn btn-primary" onclick="generateTest()">👁 Preview Test</button>
         <button class="btn btn-success" onclick="printTest()">🖨 Print / Save as PDF</button>
+        <button class="btn btn-secondary" id="saveTestBtn" style="display:none;" onclick="saveCurrentTest()">💾 Save Test</button>
+        <button class="btn btn-purple" id="downloadTestBtn" style="display:none;" onclick="downloadCurrentTest()">⬇ Download as HTML</button>
       </div>
     </div>
     <div id="testPreview"></div>
+  </div>
+
+  <!-- ══ SAVED TESTS PANEL ══ -->
+  <div class="panel" id="panel-saved">
+    <div class="card" style="padding:16px 20px;margin-bottom:20px;">
+      <div style="font-size:15px;font-weight:600;color:var(--gray-800);">📁 Saved Tests</div>
+      <div style="font-size:13px;color:var(--gray-500);margin-top:4px;">Tests you've saved from the Generate tab. View, reprint, or download them as HTML files.</div>
+    </div>
+    <div id="savedTestsList"></div>
   </div>
 
 </div><!-- end .main -->
@@ -389,8 +401,13 @@ const STORAGE_KEY = 'appsych_testbank_v2';
 function loadData(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[];}catch{return[];}}
 function saveData(){localStorage.setItem(STORAGE_KEY,JSON.stringify(questions));}
 
+const SAVED_TESTS_KEY = 'appsych_saved_tests_v1';
+function loadSavedTests(){try{return JSON.parse(localStorage.getItem(SAVED_TESTS_KEY))||[];}catch{return[];}}
+function saveSavedTestsData(){localStorage.setItem(SAVED_TESTS_KEY,JSON.stringify(savedTests));}
+
 // @@QUESTIONS_INIT_START@@
 let questions = loadData();
+let savedTests = loadSavedTests();
 let selectedIds = new Set();
 
 if(questions.length===0){
@@ -445,9 +462,10 @@ function switchTab(name){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
-  ['bank','add','generate'].forEach((n,i)=>{if(n===name)document.querySelectorAll('.nav-tab')[i].classList.add('active');});
+  ['bank','add','generate','saved'].forEach((n,i)=>{if(n===name)document.querySelectorAll('.nav-tab')[i].classList.add('active');});
   if(name==='bank')renderBank();
   if(name==='generate')populateGenUnits();
+  if(name==='saved')renderSavedTests();
 }
 
 function updateStats(){
@@ -797,6 +815,9 @@ function generateTest(){
   html+=`</div>`;
   document.getElementById('testPreview').innerHTML=html;
   buildPrint(pool,title,showKey);
+  _currentTestData={pool,title,showKey,date:new Date().toISOString().slice(0,10)};
+  document.getElementById('saveTestBtn').style.display='inline-flex';
+  document.getElementById('downloadTestBtn').style.display='inline-flex';
   toast('Test ready! Use Print / Save as PDF to export.','success');
 }
 
@@ -843,6 +864,150 @@ let _tt;
 function toast(msg,type){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(type?' '+type:'');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2800);}
 
 // ─────────────────────────────────────────────
+//  SAVED TESTS
+// ─────────────────────────────────────────────
+let _currentTestData = null;
+
+function saveCurrentTest(){
+  if(!_currentTestData){toast('Generate a test first.','error');return;}
+  const {pool,title,showKey,date}=_currentTestData;
+  const mc=pool.filter(q=>(q.type||'multiple_choice')==='multiple_choice').length;
+  const es=pool.filter(q=>(q.type||'multiple_choice')==='essay').length;
+  savedTests.unshift({id:Date.now(),title,date,total:pool.length,mc,essay:es,showKey,pool});
+  saveSavedTestsData();
+  toast('Test saved to Saved Tests tab!','success');
+}
+
+function downloadCurrentTest(){
+  if(!_currentTestData){toast('Generate a test first.','error');return;}
+  const {pool,title,showKey,date}=_currentTestData;
+  triggerTestDownload(pool,title,showKey,date);
+}
+
+function downloadSavedTest(id){
+  const t=savedTests.find(x=>x.id===id);if(!t)return;
+  triggerTestDownload(t.pool,t.title,t.showKey,t.date);
+}
+
+function triggerTestDownload(pool,title,showKey,date){
+  const html=buildDownloadHTML(pool,title,showKey,date);
+  const a=document.createElement('a');
+  const safe=title.replace(/[^a-z0-9]/gi,'_').toLowerCase();
+  a.href='data:text/html;charset=utf-8,'+encodeURIComponent(html);
+  a.download=`${safe}_${date||'test'}.html`;
+  a.click();
+  toast('Test downloaded!','success');
+}
+
+function buildDownloadHTML(pool,title,showKey,date){
+  const letters=['A','B','C','D'];
+  const mc=pool.filter(q=>(q.type||'multiple_choice')==='multiple_choice');
+  const es=pool.filter(q=>(q.type||'multiple_choice')==='essay');
+  const esc2=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  let body='';
+  pool.forEach((q,i)=>{
+    const isEssay=(q.type||'multiple_choice')==='essay';
+    body+=`<div class="q"><p class="qt">${i+1}. ${esc2(q.text)}</p>`;
+    if(q.image)body+=`<img src="${q.image}" style="max-width:85%;max-height:200px;margin:8px 0;display:block;"/>`;
+    if(isEssay){
+      body+=`<div class="lines"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div>`;
+    } else {
+      body+=`<ul class="choices">`+(q.choices||[]).map((c,ci)=>`<li>${letters[ci]}) ${esc2(c)}</li>`).join('')+`</ul>`;
+    }
+    body+=`</div>`;
+  });
+  let keyHtml='';
+  if(showKey&&mc.length){
+    const keyed=pool.map((q,i)=>({...q,num:i+1})).filter(q=>(q.type||'multiple_choice')==='multiple_choice');
+    keyHtml=`<div class="key"><strong>Answer Key:</strong> ${keyed.map(q=>`${q.num}. ${q.correct}`).join(' &nbsp; ')}</div>`;
+  }
+  return`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><title>${esc2(title)}</title><style>
+body{font-family:Georgia,serif;color:#000;padding:40px;max-width:800px;margin:0 auto;}
+h1{font-size:22px;margin-bottom:4px;}
+.meta{font-size:13px;color:#444;margin-bottom:30px;}
+.q{margin-bottom:24px;page-break-inside:avoid;}
+.qt{font-size:15px;font-weight:bold;margin-bottom:8px;}
+.choices{padding-left:20px;margin:0;}
+.choices li{font-size:14px;margin-bottom:4px;list-style:none;}
+.lines .line{border-bottom:1px solid #ccc;margin-top:32px;}
+.key{margin-top:40px;border-top:2px solid #000;padding-top:16px;font-size:14px;}
+@media print{body{padding:20px;}}
+</style></head><body>
+<h1>${esc2(title)}</h1>
+<div class="meta">Name: __________________________ &nbsp; Date: ____________ &nbsp; Score: _____/${mc.length} MC &nbsp; _____/${es.length} Essay &nbsp; | Generated: ${date||''}</div>
+${body}${keyHtml}
+</body></html>`;
+}
+
+function viewSavedTest(id){
+  const t=savedTests.find(x=>x.id===id);if(!t)return;
+  switchTab('generate');
+  _currentTestData={pool:t.pool,title:t.title,showKey:t.showKey,date:t.date};
+  const letters=['A','B','C','D'];
+  const mc=t.pool.filter(q=>(q.type||'multiple_choice')==='multiple_choice');
+  const es=t.pool.filter(q=>(q.type||'multiple_choice')==='essay');
+  let html=`<div class="card"><div class="card-title" style="font-size:18px;">${esc(t.title)}</div>
+    <div style="font-size:13px;color:var(--gray-500);margin-bottom:20px;">${t.pool.length} questions — ${mc.length} multiple choice, ${es.length} essay &nbsp;|&nbsp; Saved: ${t.date}</div>`;
+  t.pool.forEach((q,i)=>{
+    const isEssay=(q.type||'multiple_choice')==='essay';
+    html+=`<div class="q-card" style="border-left-color:var(--primary);">
+      <div class="q-header"><div class="q-num">${i+1}.</div><div class="q-text">${esc(q.text)}</div></div>
+      <div class="q-meta"><span class="badge badge-unit">${esc(q.unit)}</span><span class="badge badge-${q.difficulty.toLowerCase()}">${q.difficulty}</span>${isEssay?'<span class="badge badge-essay">Essay</span>':''}</div>`;
+    if(q.image)html+=`<img src="${q.image}" class="q-image" alt="question image"/>`;
+    if(isEssay){html+=`<div style="font-size:13px;color:var(--gray-500);font-style:italic;">Written response required</div>`;}
+    else{html+=`<div class="q-choices">${(q.choices||[]).map((c,ci)=>`<div class="q-choice"><span class="q-choice-marker">${letters[ci]}.</span> ${esc(c)}</div>`).join('')}</div>`;}
+    html+=`</div>`;
+  });
+  if(t.showKey&&mc.length){
+    const keyed=t.pool.map((q,i)=>({...q,num:i+1})).filter(q=>(q.type||'multiple_choice')==='multiple_choice');
+    html+=`<div style="margin-top:24px;padding-top:16px;border-top:2px solid var(--gray-200);">
+      <div class="card-title">Answer Key</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;">
+      ${keyed.map(q=>`<div style="font-size:13px;padding:5px 8px;background:var(--green-light);border-radius:6px;color:var(--green);font-weight:500;">${q.num}. ${q.correct}</div>`).join('')}
+      </div></div>`;
+  }
+  html+=`</div>`;
+  document.getElementById('testPreview').innerHTML=html;
+  buildPrint(t.pool,t.title,t.showKey);
+  document.getElementById('saveTestBtn').style.display='none';
+  document.getElementById('downloadTestBtn').style.display='inline-flex';
+}
+
+function deleteSavedTest(id){
+  if(!confirm('Delete this saved test?'))return;
+  savedTests=savedTests.filter(t=>t.id!==id);
+  saveSavedTestsData();
+  renderSavedTests();
+  toast('Test deleted.','');
+}
+
+function renderSavedTests(){
+  const list=document.getElementById('savedTestsList');
+  if(!savedTests.length){
+    list.innerHTML=`<div class="empty"><div class="empty-icon">📭</div><div>No saved tests yet. Generate a test and click <strong>💾 Save Test</strong>.</div></div>`;
+    return;
+  }
+  list.innerHTML=savedTests.map(t=>`
+    <div class="q-card">
+      <div class="q-header">
+        <div class="q-text" style="font-size:16px;font-weight:600;">${esc(t.title)}</div>
+      </div>
+      <div class="q-meta">
+        <span class="badge badge-unit">📅 ${t.date||'Unknown date'}</span>
+        <span class="badge badge-medium">${t.total} questions</span>
+        <span class="badge badge-easy">${t.mc} MC</span>
+        ${t.essay?`<span class="badge badge-essay">${t.essay} Essay</span>`:''}
+        ${t.showKey?'<span class="badge" style="background:#e0e7ff;color:#4f46e5;">Answer key included</span>':''}
+      </div>
+      <div class="q-actions">
+        <button class="btn btn-primary btn-sm" onclick="viewSavedTest(${t.id})">👁 View & Print</button>
+        <button class="btn btn-purple btn-sm" onclick="downloadSavedTest(${t.id})">⬇ Download HTML</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteSavedTest(${t.id})">🗑 Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+// ─────────────────────────────────────────────
 //  PASSWORD
 // ─────────────────────────────────────────────
 const _PH='S29jaDJAdGVzdA=='; // encoded teacher password
@@ -871,7 +1036,7 @@ function saveBank(){
   const si=html.indexOf(SM);
   const ei=html.indexOf(EM);
   if(si<0||ei<0){toast('Save marker not found — use Export CSV instead.','error');return;}
-  const replacement=`${SM}\nlet questions=${JSON.stringify(questions)};\nlet selectedIds=new Set();\n${EM}`;
+  const replacement=`${SM}\nlet questions=${JSON.stringify(questions)};\nlet savedTests=${JSON.stringify(savedTests)};\nlet selectedIds=new Set();\n${EM}`;
   const newHtml=html.slice(0,si)+replacement+html.slice(ei+EM.length);
   const a=document.createElement('a');
   a.href='data:text/html;charset=utf-8,'+encodeURIComponent(newHtml);
