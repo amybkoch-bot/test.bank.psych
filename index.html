@@ -155,6 +155,18 @@
     .toast.show{opacity:1;transform:translateY(0);}
     .toast.success{background:var(--green);}
     .toast.error{background:var(--red);}
+
+    /* Password Overlay */
+    .pw-overlay{position:fixed;inset:0;background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%);z-index:99999;display:flex;align-items:center;justify-content:center;}
+    .pw-box{background:#fff;border-radius:16px;padding:40px;max-width:380px;width:90%;box-shadow:var(--shadow-lg);text-align:center;}
+    .pw-title{font-size:22px;font-weight:700;color:var(--gray-800);margin-bottom:6px;}
+    .pw-sub{font-size:14px;color:var(--gray-500);margin-bottom:24px;}
+    .pw-input{width:100%;padding:11px 14px;border:2px solid var(--gray-200);border-radius:10px;font-size:16px;margin-bottom:14px;outline:none;transition:border .15s;text-align:center;letter-spacing:2px;}
+    .pw-input:focus{border-color:var(--primary);}
+    .pw-btn{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;}
+    .pw-btn:hover{background:var(--primary-dark);}
+    .pw-error{color:var(--red);font-size:13px;margin-top:10px;min-height:20px;}
+
   .img-upload-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
 .img-preview-wrap{position:relative;display:inline-flex;align-items:flex-start;}
 .img-preview{max-width:260px;max-height:180px;border-radius:8px;border:1px solid var(--gray-200);display:block;}
@@ -164,6 +176,18 @@
 </style>
 </head>
 <body>
+
+<!-- Password Overlay -->
+<div class="pw-overlay" id="pwOverlay">
+  <div class="pw-box">
+    <div style="font-size:48px;margin-bottom:12px;">📚</div>
+    <div class="pw-title">AP Psychology Test Bank</div>
+    <div class="pw-sub">Teacher access only — please enter your password</div>
+    <input class="pw-input" type="password" id="pwInput" placeholder="••••••••••" onkeydown="if(event.key==='Enter')checkPw()" autofocus />
+    <button class="pw-btn" onclick="checkPw()">Unlock</button>
+    <div class="pw-error" id="pwError"></div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 <div id="printArea"></div>
@@ -227,6 +251,7 @@
         </div>
         <button class="btn btn-secondary btn-sm" onclick="downloadTemplate()">⬇ Download template</button>
         <button class="btn btn-secondary btn-sm" onclick="exportAllQuestions()">💾 Export all questions</button>
+        <button class="btn btn-success btn-sm" onclick="saveBank()">💾 Save Bank to File</button>
         <span style="font-size:12px;color:var(--gray-400);">CSV format: question_text, unit, difficulty, type, choice_a–d, correct (A/B/C/D), explanation</span>
       </div>
     </div>
@@ -364,6 +389,7 @@ const STORAGE_KEY = 'appsych_testbank_v2';
 function loadData(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[];}catch{return[];}}
 function saveData(){localStorage.setItem(STORAGE_KEY,JSON.stringify(questions));}
 
+// @@QUESTIONS_INIT_START@@
 let questions = loadData();
 let selectedIds = new Set();
 
@@ -408,6 +434,7 @@ if(questions.length===0){
   ];
   saveData();
 }
+// @@QUESTIONS_INIT_END@@
 
 let nextId = questions.reduce((max,q)=>Math.max(max,q.id),0)+1;
 
@@ -814,6 +841,44 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=0|Math.random()*(i+1);[b[i],b[j]]=[b[j],b[i]];}return b;}
 let _tt;
 function toast(msg,type){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(type?' '+type:'');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2800);}
+
+// ─────────────────────────────────────────────
+//  PASSWORD
+// ─────────────────────────────────────────────
+const _PH='S29jaDJAdGVzdA=='; // encoded teacher password
+function checkPw(){
+  const v=document.getElementById('pwInput').value;
+  if(btoa(v)===_PH){
+    document.getElementById('pwOverlay').style.display='none';
+    sessionStorage.setItem('tb_auth','1');
+  } else {
+    document.getElementById('pwError').textContent='Incorrect password. Please try again.';
+    document.getElementById('pwInput').value='';
+    document.getElementById('pwInput').focus();
+  }
+}
+if(sessionStorage.getItem('tb_auth')==='1'){
+  document.getElementById('pwOverlay').style.display='none';
+}
+
+// ─────────────────────────────────────────────
+//  SAVE BANK
+// ─────────────────────────────────────────────
+function saveBank(){
+  if(!questions.length){toast('No questions to save.','error');return;}
+  const html=document.documentElement.outerHTML;
+  const SM='// @@QUESTIONS_INIT_START@@', EM='// @@QUESTIONS_INIT_END@@';
+  const si=html.indexOf(SM);
+  const ei=html.indexOf(EM);
+  if(si<0||ei<0){toast('Save marker not found — use Export CSV instead.','error');return;}
+  const replacement=`${SM}\nlet questions=${JSON.stringify(questions)};\nlet selectedIds=new Set();\n${EM}`;
+  const newHtml=html.slice(0,si)+replacement+html.slice(ei+EM.length);
+  const a=document.createElement('a');
+  a.href='data:text/html;charset=utf-8,'+encodeURIComponent(newHtml);
+  a.download='ap_psych_testbank.html';
+  a.click();
+  toast('Bank saved! Open the downloaded file next time to keep all your questions.','success');
+}
 
 // ─────────────────────────────────────────────
 //  INIT
