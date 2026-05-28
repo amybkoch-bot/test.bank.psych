@@ -378,6 +378,7 @@
         <button class="btn btn-success" onclick="printTest()">🖨 Print / Save as PDF</button>
         <button class="btn btn-secondary" id="saveTestBtn" style="display:none;" onclick="saveCurrentTest()">💾 Save Test</button>
         <button class="btn btn-purple" id="downloadTestBtn" style="display:none;" onclick="downloadCurrentTest()">⬇ Download as HTML</button>
+        <span id="driveReminder" style="display:none;font-size:12px;color:var(--accent);font-weight:500;">☁️ To save to Google Drive, drag the downloaded file into your Claude chat.</span>
       </div>
     </div>
     <div id="testPreview"></div>
@@ -388,6 +389,7 @@
     <div class="card" style="padding:16px 20px;margin-bottom:20px;">
       <div style="font-size:15px;font-weight:600;color:var(--gray-800);">📁 Saved Tests</div>
       <div style="font-size:13px;color:var(--gray-500);margin-top:4px;">Tests you've saved from the Generate tab. View, reprint, or download them as HTML files.</div>
+      <div style="font-size:12px;color:var(--accent);font-weight:500;margin-top:8px;">☁️ To save a test to Google Drive, download it then drag the file into your Claude chat.</div>
     </div>
     <div id="savedTestsList"></div>
   </div>
@@ -777,6 +779,7 @@ function generateTest(){
   _currentTestData={pool,title,showKey,date:new Date().toISOString().slice(0,10)};
   document.getElementById('saveTestBtn').style.display='inline-flex';
   document.getElementById('downloadTestBtn').style.display='inline-flex';
+  document.getElementById('driveReminder').style.display='inline';
   toast('Test ready! Use Print / Save as PDF to export.','success');
 }
 
