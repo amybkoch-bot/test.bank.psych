@@ -254,6 +254,7 @@
         <button class="btn btn-secondary btn-sm" onclick="exportAllQuestions()">💾 Export all questions</button>
         <button class="btn btn-success btn-sm" onclick="saveBank()">💾 Save Bank to File</button>
         <span style="font-size:12px;color:var(--gray-400);">CSV format: question_text, unit, difficulty, type, choice_a–d, correct (A/B/C/D), explanation</span>
+        <span style="font-size:12px;color:var(--accent);font-weight:500;">⚠️ After importing, click <strong>Save Bank to File</strong> and replace index.html to keep your questions permanently.</span>
       </div>
     </div>
     <div id="bankList"></div>
@@ -891,11 +892,8 @@ function downloadSavedTest(id){
 
 function triggerTestDownload(pool,title,showKey,date){
   const html=buildDownloadHTML(pool,title,showKey,date);
-  const a=document.createElement('a');
   const safe=title.replace(/[^a-z0-9]/gi,'_').toLowerCase();
-  a.href='data:text/html;charset=utf-8,'+encodeURIComponent(html);
-  a.download=`${safe}_${date||'test'}.html`;
-  a.click();
+  blobDownload(html,`${safe}_${date||'test'}.html`);
   toast('Test downloaded!','success');
 }
 
@@ -1029,20 +1027,46 @@ if(sessionStorage.getItem('tb_auth')==='1'){
 // ─────────────────────────────────────────────
 //  SAVE BANK
 // ─────────────────────────────────────────────
+function blobDownload(content,filename,type){
+  const blob=new Blob([content],{type:type||'text/html'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},3000);
+}
+
 function saveBank(){
   if(!questions.length){toast('No questions to save.','error');return;}
+  // Fetch the original source file so we get clean script text (not outerHTML which
+  // can mangle quotes/encoding on large banks).
+  fetch(location.href)
+    .then(r=>r.text())
+    .then(html=>{
+      const SM='// @@QUESTIONS_INIT_START@@', EM='// @@QUESTIONS_INIT_END@@';
+      const si=html.indexOf(SM), ei=html.indexOf(EM);
+      if(si<0||ei<0){
+        // Fallback: try outerHTML
+        saveBankFromDOM();return;
+      }
+      const replacement=`${SM}\nlet questions=${JSON.stringify(questions)};\nlet savedTests=${JSON.stringify(savedTests)};\nlet selectedIds=new Set();\n${EM}`;
+      const newHtml=html.slice(0,si)+replacement+html.slice(ei+EM.length);
+      blobDownload(newHtml,'ap_psych_testbank.html');
+      toast(`Saved ${questions.length} questions! Replace index.html with the downloaded file.`,'success');
+    })
+    .catch(()=>saveBankFromDOM());
+}
+
+function saveBankFromDOM(){
+  // Fallback when fetch() can't read the source (e.g. file:// + strict CORS)
   const html=document.documentElement.outerHTML;
   const SM='// @@QUESTIONS_INIT_START@@', EM='// @@QUESTIONS_INIT_END@@';
-  const si=html.indexOf(SM);
-  const ei=html.indexOf(EM);
-  if(si<0||ei<0){toast('Save marker not found — use Export CSV instead.','error');return;}
+  const si=html.indexOf(SM), ei=html.indexOf(EM);
+  if(si<0||ei<0){toast('Could not save — use Export CSV as a backup.','error');return;}
   const replacement=`${SM}\nlet questions=${JSON.stringify(questions)};\nlet savedTests=${JSON.stringify(savedTests)};\nlet selectedIds=new Set();\n${EM}`;
   const newHtml=html.slice(0,si)+replacement+html.slice(ei+EM.length);
-  const a=document.createElement('a');
-  a.href='data:text/html;charset=utf-8,'+encodeURIComponent(newHtml);
-  a.download='ap_psych_testbank.html';
-  a.click();
-  toast('Bank saved! Open the downloaded file next time to keep all your questions.','success');
+  blobDownload(newHtml,'ap_psych_testbank.html');
+  toast(`Saved ${questions.length} questions! Replace index.html with the downloaded file.`,'success');
 }
 
 // ─────────────────────────────────────────────
