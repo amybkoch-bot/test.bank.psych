@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <title>AP Psychology Test Bank</title>
   <style>
     :root {
@@ -137,17 +139,20 @@
     #printArea{display:none;}
     @media print{
       body>*:not(#printArea){display:none!important;}
-      #printArea{display:block!important;padding:40px;font-family:Georgia,serif;color:#000;}
-      .print-header{margin-bottom:30px;}
+      #printArea{display:block!important;padding:30px;color:#000;}
+      .print-header{margin-bottom:24px;}
       .print-title{font-size:22px;font-weight:bold;margin-bottom:4px;}
       .print-meta{font-size:13px;color:#444;}
-      .print-q{margin-bottom:24px;page-break-inside:avoid;}
-      .print-q-text{font-size:15px;margin-bottom:8px;font-weight:500;}
-      .print-choices{padding-left:16px;}
-      .print-choice{font-size:14px;margin-bottom:4px;}
+      .print-q{margin-bottom:20px;page-break-inside:avoid;break-inside:avoid;}
+      .print-q-text{margin-bottom:6px;font-weight:500;text-indent:-1.8em;padding-left:1.8em;}
+      .print-choices{margin-left:1.8em;padding-left:0;}
+      .print-choice{margin-bottom:3px;}
+      .print-choices-cols{margin-left:1.8em;display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:column;grid-template-rows:auto auto;gap:3px 24px;}
       .print-essay-lines{margin-top:8px;}
       .print-essay-line{border-bottom:1px solid #ccc;margin-top:32px;}
-      .print-answer-key{margin-top:40px;border-top:2px solid #000;padding-top:16px;}
+      .print-answer-key{margin-top:40px;border-top:2px solid #000;padding-top:16px;page-break-inside:avoid;break-inside:avoid;}
+      .print-q-cols{column-count:2;column-gap:36px;}
+      .print-q-cols .print-q{break-inside:avoid;page-break-inside:avoid;}
     }
 
     /* Toast */
@@ -370,6 +375,34 @@
           <select id="genAnswerKey">
             <option value="yes">Yes — at the end</option>
             <option value="no">No</option>
+          </select>
+        </div>
+        <div class="gen-option">
+          <label>Print Font</label>
+          <select id="printFont">
+            <option value="Georgia,serif">Georgia</option>
+            <option value="&apos;Times New Roman&apos;,Times,serif">Times New Roman</option>
+            <option value="Arial,Helvetica,sans-serif">Arial</option>
+            <option value="&apos;Proxima Nova&apos;,&apos;Open Sans&apos;,Arial,sans-serif">Proxima Nova</option>
+            <option value="&apos;Open Sans&apos;,Arial,sans-serif">Open Sans</option>
+          </select>
+        </div>
+        <div class="gen-option">
+          <label>Font Size</label>
+          <select id="printFontSize">
+            <option value="10pt">10 pt</option>
+            <option value="11pt">11 pt</option>
+            <option value="12pt" selected>12 pt</option>
+            <option value="13pt">13 pt</option>
+            <option value="14pt">14 pt</option>
+          </select>
+        </div>
+        <div class="gen-option">
+          <label>Paper Layout</label>
+          <select id="printLayout">
+            <option value="standard">Standard</option>
+            <option value="choices-cols">Compact — choices in 2 columns</option>
+            <option value="q-cols">Two-column questions</option>
           </select>
         </div>
       </div>
@@ -787,21 +820,46 @@ function buildPrint(pool,title,showKey){
   const letters=['A','B','C','D'];
   const mcqs=pool.filter(q=>(q.type||'multiple_choice')==='multiple_choice');
   const essays=pool.filter(q=>(q.type||'multiple_choice')==='essay');
-  let html=`<div class="print-header">
+
+  // Read print formatting options (with safe fallbacks for saved-test reprints)
+  const font=(document.getElementById('printFont')||{value:'Georgia,serif'}).value||'Georgia,serif';
+  const fontSize=(document.getElementById('printFontSize')||{value:'12pt'}).value||'12pt';
+  const layout=(document.getElementById('printLayout')||{value:'standard'}).value||'standard';
+  const useChoiceCols=layout==='choices-cols';
+  const useQCols=layout==='q-cols';
+
+  // Inject style overrides so font/size survive the print media query
+  let html=`<style>
+    #printArea,#printArea .print-q-text,#printArea .print-choice,#printArea .print-choices-cols .print-choice{font-family:${font}!important;font-size:${fontSize}!important;}
+    #printArea .print-meta,#printArea .print-answer-key{font-family:${font}!important;}
+  </style>`;
+
+  html+=`<div class="print-header">
     <div class="print-title">${esc(title)}</div>
-    <div class="print-meta">Name: __________________________ &nbsp; Date: ____________ &nbsp; Score: _____/${mcqs.length} MC &nbsp; _____/${essays.length} Essay</div>
   </div>`;
+
+  // Threshold: use 2-col choices only when every choice fits on one ~half-line
+  // (~42 chars is a safe estimate for half a typical printed line at 12pt)
+  const COL_THRESHOLD=42;
+  let qHtml='';
   pool.forEach((q,i)=>{
     const isEssay=(q.type||'multiple_choice')==='essay';
-    html+=`<div class="print-q"><div class="print-q-text">${i+1}. ${esc(q.text)}</div>`;
-    if(q.image)html+=`<img src="${q.image}" class="print-q-image" alt="question image"/>`;
+    qHtml+=`<div class="print-q"><div class="print-q-text">${i+1}. ${esc(q.text)}</div>`;
+    if(q.image)qHtml+=`<img src="${q.image}" class="print-q-image" alt="question image"/>`;
     if(isEssay){
-      html+=`<div class="print-essay-lines"><div class="print-essay-line"></div><div class="print-essay-line"></div><div class="print-essay-line"></div><div class="print-essay-line"></div></div>`;
+      qHtml+=`<div class="print-essay-lines"><div class="print-essay-line"></div><div class="print-essay-line"></div><div class="print-essay-line"></div><div class="print-essay-line"></div></div>`;
     } else {
-      html+=`<div class="print-choices">${(q.choices||[]).map((c,ci)=>`<div class="print-choice">${letters[ci]}) ${esc(c)}</div>`).join('')}</div>`;
+      const choices=q.choices||[];
+      // Use 2-col layout only when requested AND all choices are short enough
+      const canCols=useChoiceCols&&choices.every(c=>c.length<=COL_THRESHOLD);
+      const choiceClass=canCols?'print-choices-cols':'print-choices';
+      qHtml+=`<div class="${choiceClass}">${choices.map((c,ci)=>`<div class="print-choice">${letters[ci]}) ${esc(c)}</div>`).join('')}</div>`;
     }
-    html+=`</div>`;
+    qHtml+=`</div>`;
   });
+
+  html+=useQCols?`<div class="print-q-cols">${qHtml}</div>`:qHtml;
+
   if(showKey&&mcqs.length){
     const keyed=pool.map((q,i)=>({...q,num:i+1})).filter(q=>(q.type||'multiple_choice')==='multiple_choice');
     html+=`<div class="print-answer-key"><strong>Answer Key:</strong> ${keyed.map(q=>`${q.num}. ${q.correct}`).join(' &nbsp; ')}</div>`;
